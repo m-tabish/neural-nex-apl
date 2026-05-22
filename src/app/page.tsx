@@ -95,7 +95,7 @@ export default function Home() {
         );
         const landmarker = await PoseLandmarker.createFromOptions(filesetResolver, {
           baseOptions: {
-            modelAssetPath: "https://storage.googleapis.com/mediapipe-models/pose_landmarker/pose_landmarker_full.task",
+            modelAssetPath: "https://storage.googleapis.com/mediapipe-models/pose_landmarker/pose_landmarker_full/float16/1/pose_landmarker_full.task",
             delegate: "GPU"
           },
           runningMode: "VIDEO",
