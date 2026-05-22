@@ -4,6 +4,14 @@ import { generateText } from 'ai';
 
 export const maxDuration = 30;
 
+export async function GET() {
+  return NextResponse.json({ 
+    status: "ok", 
+    message: "PitchVision AI API is live",
+    env_configured: !!process.env.GOOGLE_GENERATIVE_AI_API_KEY
+  });
+}
+
 export async function POST(req: Request) {
   try {
     const body = await req.json();
@@ -19,10 +27,10 @@ export async function POST(req: Request) {
     const apiKey = process.env.GOOGLE_GENERATIVE_AI_API_KEY;
 
     if (!apiKey) {
-      console.error("CRITICAL: GOOGLE_GENERATIVE_AI_API_KEY is missing in environment variables.");
+      console.error("CRITICAL: GOOGLE_GENERATIVE_AI_API_KEY is missing.");
       return NextResponse.json({ 
         error: "Configuration Error", 
-        message: "Gemini API key is not configured. Real-time analysis is unavailable." 
+        message: "Gemini API key is missing. Please set GOOGLE_GENERATIVE_AI_API_KEY." 
       }, { status: 500 });
     }
 
@@ -50,21 +58,30 @@ Analyze the following player statistics and biomechanical joint angles:
 
 Generate the structured JSON response. Return only raw, valid JSON.`;
 
-    const { text } = await generateText({
-      model: google('gemini-1.5-pro-latest'),
-      system: systemPrompt,
-      prompt: userPrompt,
-      temperature: 0.2,
-    });
+    try {
+      const { text } = await generateText({
+        model: google('gemini-1.5-pro'),
+        system: systemPrompt,
+        prompt: userPrompt,
+        temperature: 0.2,
+      });
 
-    const parsedData = JSON.parse(text.trim());
-    return NextResponse.json(parsedData);
+      const parsedData = JSON.parse(text.trim());
+      return NextResponse.json(parsedData);
+    } catch (aiError: any) {
+      console.error("Gemini AI Generation Error:", aiError);
+      return NextResponse.json({ 
+        error: "AI Generation Failed", 
+        message: aiError.message,
+        details: aiError.stack
+      }, { status: 500 });
+    }
 
   } catch (error: any) {
-    console.error("Error in AI Scouting Agent route:", error);
+    console.error("Request Processing Error:", error);
     return NextResponse.json({ 
       error: "Analysis Failed", 
-      message: error.message || "An unexpected error occurred during AI generation." 
+      message: error.message || "An unexpected error occurred during request processing." 
     }, { status: 500 });
   }
 }
