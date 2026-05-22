@@ -66,22 +66,22 @@ $$\theta = \arccos\left(\frac{\vec{u} \cdot \vec{v}}{\|\vec{u}\| \|\vec{v}\|}\ri
 * **Framework:** Next.js 14 (App Router) - Handles both the UI and the serverless backend API routes in one single repository.
 * **Styling:** Tailwind CSS + `shadcn/ui` + Lucide Icons (clean, premium sports analytics layout).
 * **Computer Vision:** Google MediaPipe Pose (`@mediapipe/tasks-vision`) - Runs entirely client-side for zero-latency tracking.
-* **AI Orchestration:** Vercel AI SDK + Claude 3.5 Sonnet / OpenAI.
+* **AI Orchestration:** Vercel AI SDK + Google Gemini 1.5 Pro.
 
 ---
 
 ## 🚀 Setup & Run Instructions
 
-This project is a unified Next.js application, eliminating the need for separate backend servers.
+This project is a unified Next.js application.
 
 ```bash
 # Install dependencies
 npm install
 
-# Add your AI API keys to the environment
-cp .env.example .env.local
+# Add your Gemini API key to .env
+# GOOGLE_GENERATIVE_AI_API_KEY=your_key
 
-# Run the unified development server
+# Run the development server
 npm run dev
 ```
 
@@ -91,13 +91,10 @@ npm run dev
 
 * [x] Initial setup and Next.js project directory scaffolding.
 * [x] Created system architecture, state management, and math pipeline logic.
-* [ ] Implement client-side MediaPipe pose rendering on the HTML5 canvas.
-* [ ] Connect the browser-calculated math state to the Next.js API routes (`/api/scout`).
-* [ ] Build the dashboard logs interface and test the end-to-end multi-agent flow.
-
----
-
----
+* [x] Implement client-side MediaPipe pose rendering on the HTML5 canvas.
+* [x] Connect the browser-calculated math state to the Next.js API routes (`/api/scout`).
+* [x] Integrated Google Gemini for biomechanical technical evaluation.
+* [x] Build the dashboard logs interface and test the end-to-end flow.
 
 # Product Requirements Document (PRD) for AI Generation
 

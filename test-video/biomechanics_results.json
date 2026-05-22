@@ -1,0 +1,26 @@
+{
+  "player_name": "Virat Kohli (Test)",
+  "discipline": "Cover Drive",
+  "hand": "right",
+  "biometrics": {
+    "leading_elbow_angle": 78.5,
+    "front_knee_flex_angle": 124.2
+  },
+  "analysis": {
+    "leading_elbow_quality": "Optimal High Elbow",
+    "knee_flexion_quality": "Optimal Weight Transfer",
+    "head_stability_status": "Balanced",
+    "match_percentage": 94.5
+  },
+  "evaluation": {
+    "strengths": [
+      "Stable head alignment at impact.",
+      "Good balance during the initial weight transfer."
+    ],
+    "weaknesses": [
+      "No major mechanical flaws detected in this keyframe."
+    ],
+    "mechanical_grade": "A",
+    "technical_summary": "The cover drive mechanics for Virat Kohli (Test) indicate a high level of technical proficiency with excellent elbow height and weight transfer."
+  }
+}

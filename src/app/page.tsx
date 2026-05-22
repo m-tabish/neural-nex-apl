@@ -47,6 +47,7 @@ export default function Home() {
   const [isPlaying, setIsPlaying] = useState(false);
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [isModelLoaded, setIsModelLoaded] = useState(false);
+  const [isMounted, setIsMounted] = useState(false);
   const [progress, setProgress] = useState(0);
 
   // Vision references & instances
@@ -54,22 +55,15 @@ export default function Home() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const requestRef = useRef<number | null>(null);
+  const landmarksRef = useRef<Record<number, Landmark> | null>(null);
   
   const [poseLandmarker, setPoseLandmarker] = useState<any>(null);
-  const [lastLandmarks, setLastLandmarks] = useState<Record<number, Landmark> | null>(null);
   const [calculatedBiometrics, setCalculatedBiometrics] = useState<any>(null);
   const [engineAnalysis, setEngineAnalysis] = useState<any>(null);
   const [agentOutput, setAgentOutput] = useState<any>(null);
 
   // Terminal Console Logs State
-  const [logs, setLogs] = useState<LogEntry[]>([
-    {
-      timestamp: new Date().toLocaleTimeString(),
-      message: "GullyScout Engine Core initialized.",
-      agent: "System",
-      status: "info"
-    }
-  ]);
+  const [logs, setLogs] = useState<LogEntry[]>([]);
 
   const addLog = (message: string, agent: LogEntry["agent"], status: LogEntry["status"]) => {
     setLogs((prev) => [
@@ -82,6 +76,11 @@ export default function Home() {
       }
     ]);
   };
+
+  useEffect(() => {
+    setIsMounted(true);
+    addLog("GullyScout Engine Core initialized.", "System", "info");
+  }, []);
 
   // 1. Dynamic MediaPipe Pose Landmarker client-side initialization
   useEffect(() => {
@@ -138,7 +137,7 @@ export default function Home() {
         landmarksList.forEach((lm: any, idx: number) => {
           mappedLandmarks[idx] = { x: lm.x, y: lm.y, z: lm.z, visibility: lm.visibility };
         });
-        setLastLandmarks(mappedLandmarks);
+        landmarksRef.current = mappedLandmarks;
 
         // Draw custom high-visibility neon skeleton
         drawNeonSkeleton(ctx, landmarksList, canvas.width, canvas.height);
@@ -312,7 +311,9 @@ export default function Home() {
 
   // 4. E2E trigger: Freeze video, run maths and dispatch structured Prompt
   const handleFreezeAndAnalyze = async () => {
-    if (!videoRef.current || !lastLandmarks) {
+    const currentLandmarks = landmarksRef.current;
+    
+    if (!videoRef.current || !currentLandmarks) {
       addLog("⚠️ Ingestion fail: No video loaded or joints skeleton not found.", "System", "warning");
       return;
     }
@@ -328,7 +329,7 @@ export default function Home() {
     setAgentOutput(null);
 
     // Compute metrics
-    const results = evaluateBiometricsClientSide(lastLandmarks);
+    const results = evaluateBiometricsClientSide(currentLandmarks);
     if (!results) {
       addLog("❌ Biomechanical calculations failed.", "System", "error");
       setIsAnalyzing(false);
@@ -359,8 +360,7 @@ export default function Home() {
 
       const parsed = await res.json();
       setAgentOutput(parsed);
-      addLog("📬 Scouter Agent: official dossiers compile completed successfully.", "Scout", "success");
-      addLog("✉️ Dispatch Agent: WhatsApp/Email notifications queued and resolved.", "Dispatch", "success");
+      addLog("📬 Evaluation complete: Technical dossier compiled.", "Evaluation", "success");
     } catch (err: any) {
       addLog(`❌ AI Orchestration API request failed: ${err.message}`, "System", "error");
     } finally {
@@ -390,7 +390,7 @@ export default function Home() {
     }
 
     await delay(700);
-    addLog("🗣️ Liaison Agent: Translating biomechanical data to Awadhi dialect feedback...", "Liaison", "processing");
+    addLog("🤖 Evaluation Agent: Cross-referencing benchmarks...", "Evaluation", "processing");
     await delay(1000);
   };
 
@@ -401,7 +401,7 @@ export default function Home() {
       setVideoFile(file);
       setVideoUrl(URL.createObjectURL(file));
       setIsPlaying(false);
-      setLastLandmarks(null);
+      landmarksRef.current = null;
       setCalculatedBiometrics(null);
       setEngineAnalysis(null);
       setAgentOutput(null);
@@ -500,13 +500,15 @@ _Analyzed via PitchVision AI Core._`;
                     setCalculatedBiometrics(null);
                     setEngineAnalysis(null);
                     setAgentOutput(null);
+                    addLog("🎯 Analysis mode set to Fast Bowling.", "System", "info");
                   }}
-                  className={`flex-1 py-2 rounded-xl text-xs font-semibold border transition-all ${
+                  className={`flex-1 py-2.5 rounded-xl text-xs font-bold border transition-all flex items-center justify-center gap-2 ${
                     discipline === "Fast Bowling" 
-                      ? 'bg-emerald-500/10 border-emerald-500/50 text-emerald-400 shadow-sm shadow-emerald-500/5' 
-                      : 'bg-zinc-950/40 border-zinc-800 text-zinc-400 hover:bg-zinc-900/40'
+                      ? 'bg-emerald-500 border-emerald-400 text-black shadow-lg shadow-emerald-500/20' 
+                      : 'bg-zinc-950/40 border-zinc-800 text-zinc-500 hover:bg-zinc-900/40'
                   }`}
                 >
+                  <Activity className="w-3.5 h-3.5" />
                   Fast Bowling
                 </button>
                 <button
@@ -516,13 +518,15 @@ _Analyzed via PitchVision AI Core._`;
                     setCalculatedBiometrics(null);
                     setEngineAnalysis(null);
                     setAgentOutput(null);
+                    addLog("🏏 Analysis mode set to Cover Drive (Batting).", "System", "info");
                   }}
-                  className={`flex-1 py-2 rounded-xl text-xs font-semibold border transition-all ${
+                  className={`flex-1 py-2.5 rounded-xl text-xs font-bold border transition-all flex items-center justify-center gap-2 ${
                     discipline === "Cover Drive" 
-                      ? 'bg-emerald-500/10 border-emerald-500/50 text-emerald-400 shadow-sm shadow-emerald-500/5' 
-                      : 'bg-zinc-950/40 border-zinc-800 text-zinc-400 hover:bg-zinc-900/40'
+                      ? 'bg-emerald-500 border-emerald-400 text-black shadow-lg shadow-emerald-500/20' 
+                      : 'bg-zinc-950/40 border-zinc-800 text-zinc-500 hover:bg-zinc-900/40'
                   }`}
                 >
+                  <Award className="w-3.5 h-3.5" />
                   Cover Drive
                 </button>
               </div>
@@ -781,7 +785,7 @@ _Analyzed via PitchVision AI Core._`;
             </div>
           )}
 
-          {/* SCOUTER DOSSIER */}
+          {/* EVALUATION DOSSIER */}
           {agentOutput ? (
             <div className="rounded-2xl border border-zinc-800/80 bg-zinc-900/35 overflow-hidden flex flex-col gap-5 p-5 relative">
               
@@ -790,36 +794,33 @@ _Analyzed via PitchVision AI Core._`;
                 <div className="flex items-center gap-2">
                   <Award className="w-5 h-5 text-emerald-400" />
                   <div>
-                    <h4 className="text-xs font-bold text-white uppercase tracking-wider">UPCA Scouting Card</h4>
-                    <p className="text-[10px] text-zinc-500">ID: GS-{Math.floor(1000 + Math.random() * 9000)}-LKO</p>
+                    <h4 className="text-xs font-bold text-white uppercase tracking-wider">Technical Evaluation</h4>
+                    <p className="text-[10px] text-zinc-500">ID: PV-LKO-{isMounted ? Math.floor(1000 + Math.random() * 9000) : "0000"}</p>
                   </div>
                 </div>
 
                 <div className="flex items-center gap-2">
-                  <span className="text-xs text-zinc-400">Potential:</span>
+                  <span className="text-xs text-zinc-400">Mechanical Grade:</span>
                   <span className="px-2.5 py-0.5 rounded-full text-xs font-mono font-bold bg-emerald-950/40 border border-emerald-800/40 text-emerald-400">
-                    {agentOutput.scouting_card?.overall_potential || "4.2/5"}
+                    {agentOutput.evaluation?.mechanical_grade || "B"}
                   </span>
                 </div>
               </div>
 
-              {/* Vernacular Coaching tips Awadhi */}
+              {/* Technical Summary */}
               <div className="bg-emerald-950/20 border border-emerald-800/20 rounded-xl p-4 space-y-2.5">
                 <div className="flex items-center gap-2">
-                  <MessageSquare className="w-4 h-4 text-emerald-400" />
-                  <span className="text-[10px] font-bold text-emerald-400 uppercase tracking-wider">कोचिंग फीडबैक (Awadhi / Awadh Dialect)</span>
+                  <Cpu className="w-4 h-4 text-emerald-400" />
+                  <span className="text-[10px] font-bold text-emerald-400 uppercase tracking-wider">Analyst Summary</span>
                 </div>
-                <p className="text-xs text-zinc-300 italic leading-relaxed">
-                  "{agentOutput.vernacular_feedback?.coaching_tips_awadhi}"
+                <p className="text-xs text-zinc-300 leading-relaxed">
+                  {agentOutput.evaluation?.technical_summary}
                 </p>
-                <div className="text-[10px] text-zinc-400 font-semibold">
-                  💪 {agentOutput.vernacular_feedback?.encouragement_message}
-                </div>
               </div>
 
               {/* Technical Critique bullet points */}
               <div className="space-y-3">
-                <span className="text-[10px] font-bold text-zinc-400 uppercase tracking-wider block">Selectors' Biomechanical Review</span>
+                <span className="text-[10px] font-bold text-zinc-400 uppercase tracking-wider block">Biomechanical Review</span>
                 
                 <div className="space-y-2">
                   {agentOutput.evaluation?.strengths?.map((str: string, idx: number) => (
@@ -837,34 +838,22 @@ _Analyzed via PitchVision AI Core._`;
                 </div>
               </div>
 
-              {/* Target academies list & selector summary pitch */}
-              <div className="border-t border-zinc-800/50 pt-4 space-y-4">
-                <div>
-                  <span className="text-[10px] font-bold text-zinc-500 uppercase tracking-wider block mb-1">Selectors Pitch</span>
-                  <p className="text-xs text-zinc-400 leading-relaxed">
-                    {agentOutput.scouting_card?.scouting_summary}
-                  </p>
-                </div>
-
-                <div className="flex flex-wrap gap-1.5 items-center">
-                  <span className="text-[10px] font-bold text-zinc-500 uppercase tracking-wider mr-2">Target Academies:</span>
-                  {agentOutput.scouting_card?.suggested_academies?.map((ac: string, idx: number) => (
-                    <span key={idx} className="text-[10px] font-medium text-zinc-300 bg-zinc-950 border border-zinc-850 px-2 py-0.5 rounded-md">
-                      {ac}
-                    </span>
-                  ))}
-                </div>
-              </div>
-
               {/* Action buttons */}
               <div className="flex gap-2 border-t border-zinc-850 pt-4">
+                <button
+                  type="button"
+                  onClick={() => window.print()}
+                  className="flex-1 py-2.5 rounded-xl text-xs font-semibold bg-zinc-800 hover:bg-zinc-700 text-white flex items-center justify-center gap-1.5 transition-colors"
+                >
+                  Print Report
+                </button>
                 <button
                   type="button"
                   onClick={handleShareWhatsApp}
                   className="flex-1 py-2.5 rounded-xl text-xs font-semibold bg-emerald-500 hover:bg-emerald-400 text-black flex items-center justify-center gap-1.5 transition-colors"
                 >
                   <Share2 className="w-3.5 h-3.5" />
-                  Share via WhatsApp
+                  Share Report
                 </button>
               </div>
 
