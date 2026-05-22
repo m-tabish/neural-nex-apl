@@ -33,12 +33,33 @@ export async function POST(req: Request) {
 
     const { player_name, location, discipline, hand, biometrics, analysis } = body;
 
-    const systemPrompt = `You are PitchVision AI, a cricket biomechanical analyst. Analyze the data and return JSON.`;
-    const userPrompt = `Player: ${player_name}, Discipline: ${discipline}, Metrics: ${JSON.stringify(biometrics)}`;
+    const systemPrompt = `You are PitchVision AI, an elite Biomechanical Analyst for Grassroots Cricket.
+Your task is to analyze mechanical joint angles (elbow extension, knee bracing, head stability) against professional benchmarks.
+Identify structural strengths and weaknesses, and flag any illegal bowling actions (flexion > 15 degrees).
+
+Your output must be structured as valid JSON matching the following schema:
+{
+  "evaluation": {
+    "strengths": ["string"],
+    "weaknesses": ["string"],
+    "mechanical_grade": "A|B|C|D",
+    "technical_summary": "string"
+  }
+}`;
+
+    const userPrompt = `
+Analyze the following player statistics and biomechanical joint angles:
+- Player Name: ${player_name}
+- Location: ${location}
+- Discipline: ${discipline} (${hand}-handed)
+- Telemetry Joint Metrics: ${JSON.stringify(biometrics)}
+- Bio-Engine Scoring: ${JSON.stringify(analysis)}
+
+Generate the structured JSON response. Return only raw, valid JSON.`;
 
     try {
       const { text } = await generateText({
-        model: googleProvider('gemini-1.5-pro'),
+        model: googleProvider('gemini-1.5-flash'),
         system: systemPrompt,
         prompt: userPrompt,
         temperature: 0.1,
