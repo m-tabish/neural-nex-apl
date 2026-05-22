@@ -1,6 +1,8 @@
 # PitchVision AI (Team Neural Nexus) 🏏
 ### APL Qualifiers - PS-23: Grassroots Cricket Talent Scouting
 
+#Demo Video Link :  https://drive.google.com/file/d/1QOCxON-JBW9EkeQ2OZ3K_8KHbZujddyb/view?usp=sharing
+
 PitchVision AI is a platform designed to help young cricket players in Lucknow's local maidans (like Aliganj and Rajajipuram) get discovered by formal academies and the Uttar Pradesh Cricket Association (UPCA). 
 
 Our system analyzes bowling and batting videos using client-side computer vision, calculates key biomechanical joint angles, and uses an agentic workflow to give players helpful training tips in their local dialect (Hindi/Awadhi) while autonomously drafting professional scouting profiles for selectors.

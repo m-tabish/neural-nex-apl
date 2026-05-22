@@ -201,6 +201,42 @@ export default function Home() {
         ctx.stroke();
       }
     });
+
+    // Drawing Angle Labels for Verification
+    if (landmarksRef.current) {
+      const lms = landmarksRef.current;
+      ctx.font = "bold 14px monospace";
+      ctx.fillStyle = "#fbbf24"; // Amber for high visibility
+      ctx.shadowBlur = 4;
+      ctx.shadowColor = "black";
+
+      if (discipline === "Fast Bowling") {
+        const armNodes = hand === "right" ? [12, 14, 16] : [11, 13, 15];
+        const kneeNodes = hand === "right" ? [23, 25, 27] : [24, 26, 28];
+        
+        const elbowPt = scalePt(lms[armNodes[1]]);
+        const kneePt = scalePt(lms[kneeNodes[1]]);
+        
+        const elbowAngle = calculateAngle3D(lms[armNodes[0]], lms[armNodes[1]], lms[armNodes[2]]);
+        const kneeAngle = calculateAngle3D(lms[kneeNodes[0]], lms[kneeNodes[1]], lms[kneeNodes[2]]);
+
+        ctx.fillText(`${elbowAngle.toFixed(1)}°`, elbowPt.x + 10, elbowPt.y);
+        ctx.fillText(`${kneeAngle.toFixed(1)}°`, kneePt.x + 10, kneePt.y);
+      } else {
+        const armNodes = hand === "right" ? [11, 13, 15] : [12, 14, 16];
+        const kneeNodes = hand === "right" ? [23, 25, 27] : [24, 26, 28];
+        
+        const elbowPt = scalePt(lms[armNodes[1]]);
+        const kneePt = scalePt(lms[kneeNodes[1]]);
+        
+        const elbowAngle = calculateAngle3D(lms[armNodes[0]], lms[armNodes[1]], lms[armNodes[2]]);
+        const kneeAngle = calculateAngle3D(lms[kneeNodes[0]], lms[kneeNodes[1]], lms[kneeNodes[2]]);
+
+        ctx.fillText(`${elbowAngle.toFixed(1)}°`, elbowPt.x + 10, elbowPt.y);
+        ctx.fillText(`${kneeAngle.toFixed(1)}°`, kneePt.x + 10, kneePt.y);
+      }
+      ctx.shadowBlur = 0;
+    }
   };
 
   // 3. Mathematical Vector Trigonometry calculation (Client Edge)
