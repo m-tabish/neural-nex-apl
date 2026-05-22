@@ -59,7 +59,7 @@ Generate the structured JSON response. Return only raw, valid JSON.`;
 
     try {
       const { text } = await generateText({
-        model: googleProvider('gemini-1.5-flash'),
+        model: googleProvider('gemini-2.5-flash-lite'),
         system: systemPrompt,
         prompt: userPrompt,
         temperature: 0.1,
