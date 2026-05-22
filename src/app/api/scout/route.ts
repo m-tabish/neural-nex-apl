@@ -67,7 +67,16 @@ Generate the structured JSON response. Return only raw, valid JSON.`;
 
       if (!text) throw new Error("Empty AI response");
 
-      return NextResponse.json(JSON.parse(text.trim()));
+      // Robust JSON extraction: Strip markdown code blocks if present
+      let cleanText = text.trim();
+      if (cleanText.startsWith('```')) {
+        const match = cleanText.match(/```(?:json)?\s*([\s\S]*?)\s*```/);
+        if (match && match[1]) {
+          cleanText = match[1].trim();
+        }
+      }
+
+      return NextResponse.json(JSON.parse(cleanText));
 
     } catch (aiError: any) {
       console.error("AI SDK ERROR:", aiError);
