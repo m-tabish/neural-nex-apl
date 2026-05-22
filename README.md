@@ -1,121 +1,170 @@
-# GullyScout AI - Grassroots Cricket Scouting for Lucknow
+# PitchVision AI (Team Neural Nexus) 🏏
+### APL Qualifiers - PS-23: Grassroots Cricket Talent Scouting
 
-GullyScout AI is a platform designed to help young cricket players in Lucknow's local maidans (like Aliganj and Rajajipuram) get discovered by formal academies and the Uttar Pradesh Cricket Association (UPCA). 
+PitchVision AI is a platform designed to help young cricket players in Lucknow's local maidans (like Aliganj and Rajajipuram) get discovered by formal academies and the Uttar Pradesh Cricket Association (UPCA). 
 
-Our system analyzes bowling and batting videos using computer vision, calculates key joint angles, and uses a multi-agent system to give players helpful training tips in their local dialect (Hindi/Awadhi) while drafting professional scouting profiles for selectors.
+Our system analyzes bowling and batting videos using client-side computer vision, calculates key biomechanical joint angles, and uses an agentic workflow to give players helpful training tips in their local dialect (Hindi/Awadhi) while autonomously drafting professional scouting profiles for selectors.
 
 ---
 
 ## 🎯 The Core Problem we are Solving
 Lucknow has an incredible amount of raw cricket talent, but the path from street cricket to formal selection is broken:
 * **No local scouting:** Great players in local neighborhoods go completely unnoticed because scouts can't visit every park.
-* **Injury & illegal actions:** Many young fast bowlers develop illegal actions (like "chucking" or bending their elbow too much) without realizing it, which can get them banned later.
+* **Injury & illegal actions:** Many young fast bowlers develop illegal actions (like "chucking" or excessive elbow flexion) without realizing it, which can get them banned later.
 * **Communication gap:** Many local coaches and players speak Hindi or Awadhi and don't know how to create professional sports portfolios or reach out to UPCA selectors.
 
-GullyScout AI acts as a digital scout and biomechanics coach that anyone can access using just a smartphone.
+PitchVision AI acts as a digital scout and biomechanics coach that anyone can access using just a smartphone camera.
 
 ---
 
 ## ⚙️ How it Works (Under the Hood)
-Instead of trying to run a heavy machine learning model to analyze raw pixels (which fails due to different lighting and camera distances), we use a smarter geometry-based approach:
+Instead of trying to run a heavy, supervised machine learning model to analyze raw pixels (which fails due to different lighting and camera distances), we use a smarter geometry-based approach running entirely in the browser:
 
-```
-[Upload Video] ──> [MediaPipe extracts joints] ──> [Calculate Joint Angles] ──> [AI Agents write reports] ──> [Send Alert]
+```text
+[Upload Video] ──> [MediaPipe extracts joints] ──> [Browser Calculates Angles] ──> [AI Agent writes reports] 
 ```
 
-1. **Video Ingestion:** The user uploads a 5-second video of a bowler or batsman.
-2. **Pose Tracking:** Using Google's MediaPipe, we map 33 key coordinates of the player's body in the browser.
-3. **Trigonometric Math:** The system pauses at the exact release or impact frame and calculates critical angles (like the bowling arm elbow or the front knee bend).
-4. **Agent Analysis:** A team of specialized AI prompts reads this coordinate data to generate coaching advice and formal selectors' dossiers.
+1. **Video Ingestion:** The user uploads a short video of a bowler or batsman.
+2. **Pose Tracking:** Using Google's MediaPipe, we map 33 key coordinates of the player's body directly on an HTML5 Canvas in real-time.
+3. **Trigonometric Math:** The client-side JavaScript pauses at the exact release or impact frame and instantly calculates critical angles (like the bowling arm elbow or the front knee bend) right in the browser, meaning zero server lag.
+4. **Agent Analysis:** A Next.js API Route takes this coordinate data and passes it to our specialized AI prompts to generate coaching advice and formal selectors' dossiers.
 
 ---
 
 ## 🤖 The Multi-Agent Workflow
-We split our backend logic into five simple, specialized agents to handle the workflow:
 
-1. **Telemetry Agent:** Extracts the raw $X, Y, Z$ positions of the player's joints from the video.
-2. **Evaluation Agent:** Checks the joint angles against textbook professional benchmarks (e.g., Pat Cummins' braced front leg or Virat Kohli's high elbow). It also flags chucking risks.
-3. **Vernacular Liaison Agent:** Translates the dry biomechanical data into friendly, practical coaching tips written in conversational **Hindi and Awadhi** for the player.
-4. **Scouter Agent:** If the player's score is exceptionally high (e.g., over 85%), it automatically puts together a professional "talent scout card".
-5. **Dispatch Agent:** Handles sending the final outputs through automated email drafts and WhatsApp pings.
+We orchestrate our AI logic to handle the workflow across distinct conceptual agents:
+
+1. **Evaluation Agent:** Checks the joint angles against textbook professional benchmarks (e.g., Pat Cummins' braced front leg or Virat Kohli's high elbow). It also flags chucking risks.
+2. **Vernacular Liaison Agent:** Translates the dry biomechanical data into friendly, practical coaching tips written in conversational **Hindi and Awadhi** for the player.
+3. **Scouter Agent:** If the player's biomechanical score meets the threshold, it automatically puts together a professional "talent scout card".
 
 ---
 
 ## 📐 The Scoring Math (Simple Geometry)
-To make sure our scores are accurate regardless of the camera's distance or the player's height, we look at pure angles instead of pixel distances. 
+
+To make sure our scores are accurate regardless of the camera's distance or the player's height, we look at pure angles instead of pixel distances.
 
 To find the angle ($\theta$) at any joint (like the elbow $B$ between shoulder $A$ and wrist $C$):
 
 1. **Create two vectors from the coordinates:**
-   $$\vec{u} = A - B$$
-   $$\vec{v} = C - B$$
-
+$$\vec{u} = A - B$$
+$$\vec{v} = C - B$$
 2. **Calculate the angle using the dot product formula:**
-   $$\theta = \arccos\left( \frac{\vec{u} \cdot \vec{v}}{\|\vec{u}\| \|\vec{v}\|} \right) \times \frac{180}{\pi}$$
+
+$$\theta = \arccos\left(\frac{\vec{u} \cdot \vec{v}}{\|\vec{u}\| \|\vec{v}\|}\right) \times \frac{180}{\pi}$$
+
 
 3. **Compare to Baselines:**
-   * **Fast Bowling Arm Flex:** Must be as close to $180^\circ$ as possible. If the angle bends below $165^\circ$ (more than $15^\circ$ flex), the system flags a "chucking warning".
-   * **Front-Foot Cover Drive:** Checks if the front knee bends between $120^\circ$ and $135^\circ$ for perfect weight transfer.
-
----
-
-## 📊 System Data Example (JSON Format)
-This is the structured JSON output passed from our math engine to the AI agents:
-
-```json
-{
-  "player_metadata": {
-    "name": "Aditya Verma",
-    "location": "Aliganj Maidan, Lucknow",
-    "discipline": "Right-Arm Fast"
-  },
-  "biometric_telemetry": {
-    "release_point": {
-      "bowling_arm_elbow_angle": 174.2,
-      "front_knee_bracing_angle": 161.5
-    }
-  },
-  "comparative_analysis": {
-    "chucking_risk": "Low (5.8 degree bend)",
-    "stance_match_percentage": 87.5
-  },
-  "scouting_threshold_met": true
-}
-```
+* **Fast Bowling Arm Flex:** Must be as close to 180° as possible. If the angle bends below 165°, the system flags a "chucking warning".
+* **Front-Foot Cover Drive:** Checks if the front knee bends between 120° and 135° for perfect weight transfer.
 
 ---
 
 ## 🛠️ Tech Stack
-* **Frontend:** Next.js (App Router), Tailwind CSS, Lucide Icons (clean and responsive layout).
-* **Backend:** FastAPI (Python 3.11), Uvicorn.
-* **Computer Vision:** Google MediaPipe Pose (lightweight and runs fast).
-* **AI Orchestration:** Standard Anthropic / OpenAI API calls with simple system prompts.
+
+* **Framework:** Next.js 14 (App Router) - Handles both the UI and the serverless backend API routes in one single repository.
+* **Styling:** Tailwind CSS + `shadcn/ui` + Lucide Icons (clean, premium sports analytics layout).
+* **Computer Vision:** Google MediaPipe Pose (`@mediapipe/tasks-vision`) - Runs entirely client-side for zero-latency tracking.
+* **AI Orchestration:** Vercel AI SDK + Claude 3.5 Sonnet / OpenAI.
 
 ---
 
 ## 🚀 Setup & Run Instructions
 
-### 1. Frontend (Next.js)
-```bash
-cd frontend
-npm install
-npm run dev
-```
+This project is a unified Next.js application, eliminating the need for separate backend servers.
 
-### 2. Backend (FastAPI)
 ```bash
-cd backend
-python3 -m venv venv
-source venv/bin/activate
-pip install -r requirements.txt
-uvicorn main:app --reload
+# Install dependencies
+npm install
+
+# Add your AI API keys to the environment
+cp .env.example .env.local
+
+# Run the unified development server
+npm run dev
 ```
 
 ---
 
 ## 🏆 Current Progress
-- [x] Initial setup and project directory scaffolding.
-- [x] Created system architecture and math pipeline logic.
-- [ ] Implement client-side MediaPipe pose rendering on canvas.
-- [ ] Connect FastAPI math calculations to the AI agent prompts.
-- [ ] Build the dashboard logs interface and test the end-to-end flow.
+
+* [x] Initial setup and Next.js project directory scaffolding.
+* [x] Created system architecture, state management, and math pipeline logic.
+* [ ] Implement client-side MediaPipe pose rendering on the HTML5 canvas.
+* [ ] Connect the browser-calculated math state to the Next.js API routes (`/api/scout`).
+* [ ] Build the dashboard logs interface and test the end-to-end multi-agent flow.
+
+---
+
+---
+
+# Product Requirements Document (PRD) for AI Generation
+
+## 1. Product Overview
+
+**Name:** PitchVision AI
+**Objective:** Build a web-based, multi-agent scouting dashboard that analyzes gully cricket video footage, extracts biomechanical joint angles using client-side pose estimation, and autonomously generates professional scouting reports and vernacular outreach messages.
+
+## 2. Tech Stack Requirements
+
+* **Framework:** Next.js 14 (App Router)
+* **Language:** TypeScript / JavaScript
+* **Styling:** Tailwind CSS + `shadcn/ui` (Dark Mode theme)
+* **Vision Engine:** `@mediapipe/tasks-vision` (Client-side HTML5 `<canvas>` and `<video>`)
+* **AI Orchestration:** Vercel AI SDK + LLM via API
+* **Icons:** Lucide React
+
+## 3. Core Features
+
+### Feature 1: The Vision Dashboard (UI)
+
+* A 2-column dashboard layout.
+* **Left Column (Input):** Video upload dropzone accepting `.mp4` files.
+* **Right Column (Output):** Terminal-style "Agent Execution Ledger" and result cards.
+* **Controls:** A master "Freeze & Analyze Frame" button located below the video player.
+
+### Feature 2: Client-Side Pose Estimation (MediaPipe)
+
+* When a video is uploaded and plays, an HTML5 `<canvas>` must sit perfectly overlaid on the `<video>` element using absolute positioning.
+* A `requestAnimationFrame` loop passes the current video frame to MediaPipe `PoseLandmarker`.
+* Draw the 33 pose landmarks (skeleton) on the canvas in real-time (neon green stroke).
+
+### Feature 3: Biomechanical Scoring Engine (The Math)
+
+* When the user clicks "Freeze & Analyze Frame", pause the video.
+* Extract the X/Y coordinates for: Right Shoulder (12), Right Elbow (14), and Right Wrist (16).
+* Calculate the exact angle of the elbow joint using trigonometry (`Math.atan2`).
+* Store this calculated angle in a JSON state object.
+
+### Feature 4: Multi-Agent Orchestration (API Route)
+
+* Send the JSON state (e.g., `{ "elbow_angle": 158, "action": "fast_bowling" }`) to a Next.js API route (`/api/scout`).
+* The Vercel AI SDK prompts the LLM to act as an orchestration engine of 5 sub-agents.
+* The LLM returns a structured JSON response containing:
+1. A professional English scouting report detailing mechanical flaws/strengths.
+2. A localized WhatsApp message in Hindi/Awadhi aimed at the local coach.
+
+* Stream the simulated agent "thought process" steps sequentially into the Terminal UI on the frontend to create the illusion of multiple agents executing one by one.
+
+## 4. Hardcoded Data State (Mock Pro Baselines)
+
+To bypass the need for a database, use a static reference file for comparisons:
+
+```json
+{
+  "pro_baselines": {
+    "fast_bowling_release": {
+      "ideal_elbow_angle_min": 175,
+      "ideal_elbow_angle_max": 180,
+      "penalty_threshold": 160
+    }
+  }
+}
+```
+
+## 5. Execution Phases for AI Generation
+
+* **Phase 1:** Scaffold the Next.js UI, Tailwind, and dummy UI components (Cards, Terminal log).
+* **Phase 2:** Implement the MediaPipe Pose Landmarker over the video player and calculate the elbow angle on button click.
+* **Phase 3:** Create the `/api/scout` route and wire up the Vercel AI SDK to generate the final text based on the calculated angle.
